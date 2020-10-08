@@ -6,11 +6,13 @@ services:
     image: mysql:5.7
     command:
       - "--default-authentication-plugin=mysql_native_password"
-      - "--max_allowed_packet=128M"
+      - "--max_allowed_packet=256M"
       - "--character-set-server=utf8"
       - "--collation-server=utf8_unicode_ci"
     ports:
       - 3306:3306
+    networks:
+      - backend
     volumes:
       - ${MYSQL_VOLUME:-mysql-volume}:/var/lib/mysql:Z
       - ./configs/mysql:/docker-entrypoint-initdb.d
@@ -29,6 +31,8 @@ services:
       - mysql
     depends_on:
       - mysql
+    networks:
+      - backend
     environment:
       - DB_HOST=mysql
       - DB_NAME=${MYSQL_DATABASE}
@@ -42,3 +46,8 @@ services:
 volumes:
   mysql-volume:
 
+networks:
+  backend:
+    ipam:
+      config:
+        - subnet: 172.16.0.0/16
